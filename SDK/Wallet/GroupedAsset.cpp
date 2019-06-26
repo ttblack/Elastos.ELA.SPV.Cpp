@@ -154,8 +154,11 @@ namespace Elastos {
 					continue;
 
 				tx->AddInput(TransactionInput(_coinBaseUTXOs[i]->Hash(), _coinBaseUTXOs[i]->Index()));
-				bytes_t code = _parent->_subAccount->GetRedeemScript(Address(_coinBaseUTXOs[i]->ProgramHash()));
-				tx->AddUniqueProgram(Program(code, bytes_t()));
+
+				bytes_t code;
+				std::string path;
+				_parent->_subAccount->GetCodeAndPath(Address(_coinBaseUTXOs[i]->ProgramHash()), code, path);
+				tx->AddUniqueProgram(Program(path, code, bytes_t()));
 
 				totalInputAmount += _coinBaseUTXOs[i]->Amount();
 
@@ -185,8 +188,10 @@ namespace Elastos {
 					continue;
 
 				tx->AddInput(TransactionInput(_utxos[i].Hash(), _utxos[i].Index()));
-				bytes_t code = _parent->_subAccount->GetRedeemScript(o.GetAddress());
-				tx->AddUniqueProgram(Program(code, bytes_t()));
+				bytes_t code;
+				std::string path;
+				_parent->_subAccount->GetCodeAndPath(o.GetAddress(), code, path);
+				tx->AddUniqueProgram(Program(path, code, bytes_t()));
 
 				totalInputAmount += o.GetAmount();
 
@@ -269,8 +274,10 @@ namespace Elastos {
 						continue;
 					}
 					txn->AddInput(TransactionInput(_utxos[i]._hash, _utxos[i]._n));
-					bytes_t code = _parent->_subAccount->GetRedeemScript(o.GetAddress());
-					txn->AddUniqueProgram(Program(code, bytes_t()));
+					bytes_t code;
+					std::string path;
+					_parent->_subAccount->GetCodeAndPath(o.GetAddress(), code, path);
+					txn->AddUniqueProgram(Program(path, code, bytes_t()));
 
 					totalInputAmount += o.GetAmount();
 				}
@@ -291,8 +298,10 @@ namespace Elastos {
 					continue;
 
 				txn->AddInput(TransactionInput(_coinBaseUTXOs[i]->Hash(), _coinBaseUTXOs[i]->Index()));
-				bytes_t code = _parent->_subAccount->GetRedeemScript(Address(_coinBaseUTXOs[i]->ProgramHash()));
-				txn->AddUniqueProgram(Program(code, bytes_t()));
+				bytes_t code;
+				std::string path;
+				_parent->_subAccount->GetCodeAndPath(Address(_coinBaseUTXOs[i]->ProgramHash()), code, path);
+				txn->AddUniqueProgram(Program(path, code, bytes_t()));
 
 				txSize = txn->EstimateSize();
 				if (txSize > TX_MAX_SIZE) {
@@ -353,8 +362,10 @@ namespace Elastos {
 					continue;
 				}
 				txn->AddInput(TransactionInput(_utxos[i]._hash, _utxos[i]._n));
-				bytes_t code = _parent->_subAccount->GetRedeemScript(o.GetAddress());
-				txn->AddUniqueProgram(Program(code, bytes_t()));
+				bytes_t code;
+				std::string path;
+				_parent->_subAccount->GetCodeAndPath(o.GetAddress(), code, path);
+				txn->AddUniqueProgram(Program(path, code, bytes_t()));
 
 				txSize = txn->EstimateSize();
 				if (txSize > TX_MAX_SIZE) { // transaction size-in-bytes too large
@@ -485,8 +496,10 @@ namespace Elastos {
 				}
 
 				tx->AddInput(TransactionInput(_coinBaseUTXOs[i]->Hash(), _coinBaseUTXOs[i]->Index()));
-				bytes_t code = _parent->_subAccount->GetRedeemScript(Address(_coinBaseUTXOs[i]->ProgramHash()));
-				tx->AddUniqueProgram(Program(code, bytes_t()));
+				bytes_t code;
+				std::string path;
+				_parent->_subAccount->GetCodeAndPath(Address(_coinBaseUTXOs[i]->ProgramHash()), code, path);
+				tx->AddUniqueProgram(Program(path, code, bytes_t()));
 
 				txSize = tx->EstimateSize();
 				if (txSize > TX_MAX_SIZE) {

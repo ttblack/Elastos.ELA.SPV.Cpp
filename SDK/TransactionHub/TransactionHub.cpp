@@ -112,8 +112,10 @@ namespace Elastos {
 			uint64_t result;
 			{
 				boost::mutex::scoped_lock scoped_lock(lock);
+				Log::info("TransactionHub::GetBalance:{}", type);
 				result = _transactions.Get(assetID)->GetBalance(type);
 			}
+			Log::info("TransactionHub::GetBalance result:{}", result);
 			return result;
 		}
 

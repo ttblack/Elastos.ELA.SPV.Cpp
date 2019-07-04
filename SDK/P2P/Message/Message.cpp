@@ -70,8 +70,11 @@ namespace Elastos {
 		}
 
 		const TransactionPtr Message::FireRequestedTx(const uint256 &txHash) {
-			if (_peer->_listener != nullptr)
+			if (_peer->_listener != nullptr) {
+				_peer->info("********* call lisstener OnRequestedTx *********");
 				return _peer->_listener->OnRequestedTx(_peer->shared_from_this(), txHash);
+			}
+			_peer->info("********* lisstener OnRequestedTx is null ********");
 			return nullptr;
 		}
 

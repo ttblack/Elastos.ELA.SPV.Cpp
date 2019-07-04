@@ -38,6 +38,7 @@ namespace Elastos {
 			_peer->info("got getdata with {} item(s)", count);
 			for (size_t i = 0; i < count; i++) {
 				uint32_t type;
+				_peer->info("******** count {} ******** ", i);
 				if (!stream.ReadUint32(type)) {
 					_peer->error("read inv type fail");
 					return false;
@@ -48,16 +49,21 @@ namespace Elastos {
 					_peer->error("read inv hash fail");
 					return false;
 				}
-
+				_peer->info("******** count: {} type: {}******** ", i, type);
 				switch (type) {
 					case inv_tx:
+						_peer->info("******** before FireRequestedTx hash:{}******** ", hash.ToString());
 						tx = FireRequestedTx(hash);
-
+						_peer->info("******** behind FireRequestedTx hash:{}******** ", hash.ToString());
 						if (tx != nullptr && tx->GetSize() < TX_MAX_SIZE) {
 							TransactionParameter txParam;
 							txParam.tx = tx;
+							_peer->info("******** before Send MSG_TX {}******** ", hash.ToString());
 							_peer->SendMessage(MSG_TX, txParam);
+							_peer->info("******** behind Send MSG_TX {}******** ", hash.ToString());
 							break;
+						} else {
+							_peer->info("******** didn't send MSG_TX: {}******** ", hash.ToString());
 						}
 
 						// fall through
@@ -69,9 +75,12 @@ namespace Elastos {
 				}
 			}
 
+			_peer->info("GetDataMessage Accept end");
+
 			if (notfound.GetBytes().size() > 0) {
 				SendMessage(notfound.GetBytes(), MSG_NOTFOUND);
 			}
+			_peer->info("GetDataMessage Accept end return true");
 			return true;
 		}
 

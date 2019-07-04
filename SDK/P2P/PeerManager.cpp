@@ -1572,30 +1572,38 @@ namespace Elastos {
 		}
 
 		const TransactionPtr PeerManager::OnRequestedTx(const PeerPtr &peer, const uint256 &txHash) {
+			Log::info("******** into PeerManager::OnRequestedTx*********:{}", txHash.ToString());
 			int hasPendingCallbacks = 0, error = 0;
 			PublishedTransaction pubTx;
 
 			{
+				Log::info("******** into PeerManager::OnRequestedTx to lock _publishedTx ********");
 				boost::mutex::scoped_lock scopedLock(lock);
+				Log::info("******** into PeerManager::OnRequestedTx to lock _publishedTx.size={} *******", _publishedTx.size());
 				for (size_t i = _publishedTx.size(); i > 0; i--) {
 					if (_publishedTxHashes[i - 1] == txHash) {
 						pubTx = _publishedTx[i - 1];
+						Log::info("******** find publishedTx *********:{}", pubTx.GetTransaction()->GetHash().ToString());
 //						_publishedTx[i - 1].ResetCallback();
 					} else if (_publishedTx[i - 1].HasCallback()) hasPendingCallbacks = 1;
 				}
 
 				// cancel tx publish timeout if no publish callbacks are pending, and syncing is done or this is not downloadPeer
 				if (!hasPendingCallbacks && (_syncStartHeight == 0 || peer != _downloadPeer)) {
+					Log::info("******** into PeerManager::OnRequestedTx _syncStartHeight :{} ScheduleDisconnect *******", _syncStartHeight);
 					peer->ScheduleDisconnect(-1); // cancel publish tx timeout
 				}
 
 				AddPeerToList(peer, txHash, _txRelays);
+				Log::info("******** into PeerManager::OnRequestedTx AddPeerToList end *******");
 				if (pubTx.GetTransaction() != nullptr) _wallet->RegisterTransaction(pubTx.GetTransaction());
 				if (pubTx.GetTransaction() != nullptr && !_wallet->TransactionIsValid(pubTx.GetTransaction()))
 					error = 0x10; // RejectInvalid by node
 			}
-
+			Log::info("******** into PeerManager::OnRequestedTx error:{} *******", error);
 			if (error && pubTx.HasCallback()) pubTx.FireCallback(error, "tx is invalid");
+
+			Log::info("******** into PeerManager::OnRequestedTx return *********:{}", pubTx.GetTransaction()->GetHash().ToString());
 			return pubTx.GetTransaction();
 		}
 

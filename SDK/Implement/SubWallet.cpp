@@ -85,7 +85,11 @@ namespace Elastos {
 		}
 
 		uint64_t SubWallet::GetBalance(BalanceType type) const {
-			return _walletManager->getWallet()->GetBalance(Asset::GetELAAssetID(), AssetTransactions::BalanceType(type));
+			Log::info("******** SubWallet::GetBalance type: {} ", type);
+			Log::info("******** _walletManager->getWallet() {} ", (long)_walletManager->getWallet().get());
+			uint64_t value = _walletManager->getWallet()->GetBalance(Asset::GetELAAssetID(), AssetTransactions::BalanceType(type));
+			Log::info("** ****** SubWallet::GetBalance return: {} ", value);
+			return value;
 		}
 
 		std::string SubWallet::CreateAddress() {
